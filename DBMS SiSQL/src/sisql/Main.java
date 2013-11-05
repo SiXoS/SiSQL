@@ -22,24 +22,11 @@ public class Main {
 		
 		//String sql = args[0];
 		
-		ArrayList<DBItem> items = new ArrayList<DBItem>();
-		//items.add(new StringValue("namn", "Simon"));
-		items.add(new IntValue("index", 12));
-		ArrayList<Column> cols = new ArrayList<Column>();
-		cols.add(new Column("namn", Column.Type.VARCHAR));
-		cols.add(new Column("telefon", Column.Type.VARCHAR));
-		Column testIndex = new Column("nyckel", Column.Type.INT);
-		testIndex.setIndex(true);
-		cols.add(testIndex);
+		
 		
 		try {
-			new Table("test2",cols);
-			Table test = new Table("test");
-			for(DBRow rows : test.find(items).getRows()){
-				for(DBItem item : rows.getItems())
-					System.out.println(item.getColumn() + ":" + item.getValue() + " ");
-				System.out.println();
-			}
+			Table table = new Table("test");
+			find(table);
 		} catch (NameFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,6 +39,13 @@ public class Main {
 	
 	private static void help(){
 		System.out.println("Usage: enter your SQL as parameter");
+	}
+	
+	private static void find(Table table){
+		List<DBItem> search = new ArrayList<DBItem>();
+		search.add(new IntValue("id",32));
+		search.add(new StringValue("namn","Simon Lindhén"));
+		System.out.println(table.find(search));
 	}
 
 }

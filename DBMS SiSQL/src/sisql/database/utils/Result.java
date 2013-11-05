@@ -40,5 +40,17 @@ public class Result {
 	public void setRows(LinkedList<DBRow> rows) {
 		this.rows = rows;
 	}
+	
+	@Override
+	public String toString(){
+		StringBuffer buf = new StringBuffer();
+		buf.append((success ? "succeeded" : "failed") + "\n");
+		for(DBRow row : rows){
+			for(DBItem item : row.getItems())
+				buf.append(item.getColumn() + ":" + item.getValue() + "\n");
+			buf.append("\n");
+		}
+		return buf.toString();
+	}
 
 }

@@ -5,11 +5,13 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,6 +25,8 @@ import sisql.database.utils.DBItem;
 import sisql.database.utils.DBRow;
 import sisql.database.utils.Result;
 import sisql.exceptions.NameFormatException;
+import sisql.xmlhandlers.Finder;
+import sisql.xmlhandlers.TableLoader;
 
 public class Table {
 	
@@ -48,7 +52,7 @@ public class Table {
 		
 		if(!checkValidTableName(name)) //must start with a letter and have a minimum of two characters
 			throw new NameFormatException("a-z, A-Z, 0-9. The name must also start with a letter", "The name " + name + " is not valid."); 
-		if(columns == null && columns.size() == 0)
+		if(columns == null || columns.size() == 0)
 			throw new Exception("You must specify atleast one column.");
 		
 		File xml = new File("Databases/" + name + ".xml");
@@ -127,75 +131,35 @@ public class Table {
 		if(!table.exists())
 			throw new Exception("The table " + name + " doesn't exist.");
 		
-		SAXBuilder builder = new SAXBuilder();
-	 
-		try {
-	 
-			Document document = (Document) builder.build(table);
-			Element rootNode = document.getRootElement();
-			this.nextIndex = Integer.parseInt(rootNode.getAttributeValue("nextIndex"));
-			List<Element> columns = rootNode.getChildren("columns").get(0).getChildren("column");
+		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			
-			this.columns = new HashMap<String,Column>();
-			for(Element column : columns){
-				Column col = new Column(column.getAttributeValue("name"), Column.Type.fromString(column.getAttributeValue("type")));
-				if(column.getAttribute("index") != null){
-					col.setIndex(true);
-					this.indexColumn = col.getName();
-				}
-				this.columns.put(col.getName(), col);
-			}
-	 
-		} catch (IOException io) {
-			System.out.println(io.getMessage());
-		} catch (JDOMException jdomex) {
-			System.out.println(jdomex.getMessage());
-		}
+		TableLoader loader = new TableLoader();
+		parser.parse(table, loader);
+		columns = loader.getColumns();
 		
 	}
 	
 	public Result find(List<DBItem> searchOn){
 		
 		File xml = new File("Databases/" + name + ".xml");
-		SAXBuilder builder = new SAXBuilder();
 		boolean findAll = searchOn == null ? true : false;
 		
+		Finder find = new Finder(searchOn, columns);
+		Result res = new Result();
+		
 		try{
-			
-			Document document = (Document) builder.build(xml);
-			Element rootNode = document.getRootElement();
-			
-			Result result = new Result();
-			List<Element> rows = rootNode.getChild("rows").getChildren("row");
-			for(Element row : rows){
-				boolean found = false;
-				DBRow dbrow = new DBRow();
-				for(Element value : row.getChildren()){ //we loop through each value on each row looking for a field with the correct column and value
-					DBItem XMLItem = columns.get(value.getAttributeValue("column")).getItem(value.getText());
-					dbrow.addItem(XMLItem);
-					if(!found){
-						for(DBItem SearchItem : searchOn){ //even worse, we loop through each search item for each value
-							if(SearchItem.equals(XMLItem)){
-								found = true; //although, if we have found a match on this row we can stop looking on this row
-								
-								break;
-							}
-						}
-					}
-				}
-				if(found)
-					result.addRow(dbrow);
-			}
-			
-			return result;
-			
-		}catch (IOException io) {
-			System.out.println(io.getMessage());
-		} catch (JDOMException jdomex) {
-			System.out.println(jdomex.getMessage());
+		
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(xml, find);
+			res.setRows(find.getMatches());
+			res.setSuccess(true);
+		
+		}catch(Exception e){
+			e.printStackTrace();
+			res.setSuccess(false);
 		}
 		
-		return null;
+		return res;
 		
 	}
 	

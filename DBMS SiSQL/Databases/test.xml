@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table name="test" nextIndex="13">
+  <columns>
+    <column name="namn" type="VARCHAR" />
+    <column name="id" type="INT" />
+    <column name="index" index="index" type="INT" />
+  </columns>
+  <rows>
+    <row>
+      <value column="id">32</value>
+      <value column="namn">Simon</value>
+      <value column="index">11</value>
+    </row>
+    <row>
+      <value column="id">33</value>
+      <value column="namn">Simon Lindhén</value>
+      <value column="index">12</value>
+    </row>
+  </rows>
+</table>

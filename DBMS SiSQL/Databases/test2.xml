@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table name="test2" nextIndex="1">
+  <columns>
+    <column name="namn" type="VARCHAR" />
+    <column name="telefon" type="VARCHAR" />
+    <column name="nyckel" type="INT" index="index" />
+    <column name="index" index="index" type="INT" />
+  </columns>
+  <rows />
+</table>

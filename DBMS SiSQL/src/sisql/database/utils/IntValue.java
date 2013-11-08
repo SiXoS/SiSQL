@@ -36,4 +36,15 @@ public class IntValue extends DBItem<Integer> {
 		
 	}
 
+	@Override
+	public int compareTo(DBItem comp) {
+		if(!(comp instanceof IntValue)){
+			System.err.println("WARNING: A comparison between two diffrent types of values was made.");
+			return 0;
+		}else{
+			IntValue compInt = (IntValue)comp;
+			return this.getValue().intValue()-compInt.getValue().intValue();
+		}
+	}
+
 }

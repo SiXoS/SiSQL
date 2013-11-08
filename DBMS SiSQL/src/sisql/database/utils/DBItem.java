@@ -1,6 +1,6 @@
 package sisql.database.utils;
 
-public abstract class DBItem<T> {
+public abstract class DBItem<T> implements Comparable<DBItem> {
 	
 	private String column;
 	

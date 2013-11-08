@@ -35,4 +35,15 @@ public class StringValue extends DBItem<String> {
 		
 	}
 
+	@Override
+	public int compareTo(DBItem comp) {
+		if(!(comp instanceof StringValue)){
+			System.err.println("WARNING: A comparison between two diffrent types of values was made.");
+			return 0;
+		}else{
+			StringValue compString = (StringValue)comp;
+			return this.getValue().compareTo(compString.getValue());
+		}
+	}
+
 }
